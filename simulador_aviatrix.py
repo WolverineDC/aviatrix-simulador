@@ -10,7 +10,7 @@ import os
 # Configuración de la página
 st.set_page_config(page_title="Aviatrix Pro", page_icon="✈️")
 
-# --- NUEVO: SISTEMA DE GUARDADO DE SALDO (BILLETERA VIRTUAL) ---
+# --- SISTEMA DE GUARDADO DE SALDO (BILLETERA VIRTUAL) ---
 ARCHIVO_BILLETERA = "billetera.json"
 
 def cargar_saldo():
@@ -31,7 +31,7 @@ def guardar_saldo(monto):
 
 # --- 1. INICIALIZACIÓN DE VARIABLES GLOBALES ---
 if 'saldo' not in st.session_state:
-    st.session_state.saldo = cargar_saldo() # Ahora lee desde el archivo
+    st.session_state.saldo = cargar_saldo()
 if 'historial' not in st.session_state:
     st.session_state.historial = []
 if 'historial_saldo' not in st.session_state:
@@ -62,6 +62,14 @@ def generar_multiplicador():
 st.title("✈️ Aviatrix: Modo Tiempo Real")
 st.header(f"💰 Saldo: {st.session_state.saldo:.2f} monedas")
 
+# Botón de rescate que solo aparece cuando estás en quiebra
+if st.session_state.saldo <= 0:
+    if st.button("🆘 Rescate de Emergencia: Recargar 1000 monedas", use_container_width=True):
+        st.session_state.saldo = 1000.0
+        guardar_saldo(1000.0)
+        st.session_state.historial_saldo.append(1000.0) # Registra la inyección en el gráfico
+        st.rerun()
+
 bloquear_controles = st.session_state.apostado or st.session_state.estado_juego != 'COUNTDOWN'
 
 col1, col2, col3 = st.columns(3)
@@ -88,7 +96,6 @@ with zona_boton.container():
                     st.session_state.apostado = True
                     st.session_state.apuesta_actual = apuesta_input
                     
-                    # Descontar apuesta y GUARDAR EN LA BILLETERA
                     st.session_state.saldo -= apuesta_input
                     guardar_saldo(st.session_state.saldo)
                     
@@ -109,7 +116,6 @@ with zona_boton.container():
                 st.session_state.multiplicador_cobro = m_cobro
                 ganancia = st.session_state.apuesta_actual * m_cobro
                 
-                # Sumar ganancia y GUARDAR EN LA BILLETERA
                 st.session_state.saldo += ganancia
                 guardar_saldo(st.session_state.saldo)
                 
@@ -182,7 +188,6 @@ elif st.session_state.estado_juego == 'VOLANDO':
                 st.session_state.multiplicador_cobro = st.session_state.retiro_objetivo
                 ganancia = st.session_state.apuesta_actual * st.session_state.retiro_objetivo
                 
-                # Sumar ganancia de auto-retiro y GUARDAR EN LA BILLETERA
                 st.session_state.saldo += ganancia
                 guardar_saldo(st.session_state.saldo)
                 
