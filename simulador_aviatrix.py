@@ -49,7 +49,7 @@ bloquear_controles = st.session_state.apostado or st.session_state.estado_juego 
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    apuesta_input = st.number_input("Monto a apostar:", min_value=1.0, max_value=max(1.0, float(st.session_state.saldo)), value=10.0, step=1.0, disabled=bloquear_controles)
+    apuesta_input = st.number_input("Monto a apostar:", min_value=1.0, value=10.0, step=1.0, disabled=bloquear_controles)
 with col2:
     st.write("") # Espaciador para alinear
     # Casilla de verificación para activar/desactivar el auto-retiro
